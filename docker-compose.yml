@@ -1,0 +1,76 @@
+version: '3.7'
+
+services:
+  webserver:
+    privileged: true
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: webserver
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../:/var/www/html/vhosts # sites directory
+      - ./httpd/conf.d/httpd.conf:/etc/apache2/apache2.conf # httpd config
+      - ./httpd/vhosts.d:/etc/apache2/sites-enabled # sites vhost config directory
+      - ./httpd/logs:/etc/apache2/logs/
+      - /Users/jonathanursua/cert:/etc/apache2/ssl
+      - ./php/inis/php56.ini:/etc/php/5.6/fpm/php.ini:ro
+      - ./php/inis/php56.ini:/etc/php/5.6/cli/php.ini:ro
+      - ./php/inis/php74.ini:/etc/php/7.4/fpm/php.ini:ro
+      - ./php/inis/php74.ini:/etc/php/7.4/cli/php.ini:ro
+      - ./php/inis/php82.ini:/etc/php/8.2/fpm/php.ini:ro
+      - ./php/inis/php82.ini:/etc/php/8.2/cli/php.ini:ro
+      - ./supervisord/supervisord.conf:/etc/supervisor/supervisord.conf
+      - ./supervisord/conf.d:/etc/supervisor/conf.d
+      - ./logs:/var/logs
+    networks:
+      - site-network
+
+  db:
+    platform: linux/x86_64
+    image: mysql:5.7
+    container_name: db
+    ports:
+      - "127.0.0.1:4306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./db_dump:/db_dump
+      - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    depends_on:
+      - webserver
+    environment:
+      - MYSQL_ROOT_USER=root
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - site-network
+  mssql_db:
+    platform: linux/amd64
+    image: 'mcr.microsoft.com/mssql/server:2022-latest'
+    container_name: mssql_db
+    ports:
+        - '1433:1433'
+    environment:
+        - ACCEPT_EULA=Y
+        - SA_PASSWORD=Password@1
+        - MSSQL_SA_PASSWORD=Password@1
+    volumes:
+        - mssql-db-data:/var/opt/mssql
+    networks:
+      - site-network
+
+volumes:
+  db-data:
+    driver: local # Define the driver and options under the volume name
+    driver_opts:
+      o: bind
+      type: none
+      device: ./mysql
+  mssql-db-data:
+
+networks:
+  site-network:
+    name: site-network
+    driver: bridge
+    

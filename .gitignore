@@ -1,0 +1,7 @@
+#data
+mysql/*
+logs
+Dockerfile_*
+db_dump
+
+!mysql/my.cnf
