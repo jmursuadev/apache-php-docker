@@ -3,5 +3,7 @@ mysql/*
 logs
 Dockerfile_*
 db_dump
+httpd/vhosts.d/*
 
 !mysql/my.cnf
+!httpd/vhosts.d/000-default.conf

@@ -17,8 +17,8 @@ RUN apt-get update -y \
     && apt-get install unzip -y \
     && apt-get install unixodbc-dev -y \
     && apt-get install zlib1g-dev -y \
-    && apt-get install libpng-dev \
-    && apt-get clean all 
+    && apt-get install libpng-dev -y \
+    && apt-get clean all -y
 
 # RUN wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
 # RUN echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list 
@@ -58,6 +58,7 @@ RUN apt-get update \
         php7.4-zip \
         php7.4-soap \
         php7.4-bcmath \
+        php7.4-memcache \
         php7.4-memcached \
         php8.2 \
         php8.2-dev \
@@ -71,6 +72,7 @@ RUN apt-get update \
         php8.2-gd \
         php8.2-zip \
         php8.2-soap \
+        php8.2-memcache \
         php8.2-memcached
 
 # Enable required Apache modules
